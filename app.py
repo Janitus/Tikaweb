@@ -1,13 +1,21 @@
-from flask import Flask
-from flask import render_template
-
+from flask import Flask, render_template, redirect, url_for
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    words = ["apina", "banaani", "cembalo"]
-    return render_template("index.html", message="Tervetuloa!", items=words)
+    return render_template('index.html')
 
+@app.route('/register')
+def register():
+    return "Registration Page Placeholder"
+
+@app.route('/login')
+def login():
+    return "Login Page Placeholder"
+
+@app.route('/logout')
+def logout():
+    return "Logout Page Placeholder"
 
 
 
