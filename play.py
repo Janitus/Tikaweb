@@ -6,6 +6,7 @@ play_bp = Blueprint('play_bp', __name__)
 
 @play_bp.route('/reroll', methods=['GET'])
 def reroll():
+    print("Reroll penalty!")
     session['rerolls'] += 1
     session['score'] -= 3 * session['rerolls']
 

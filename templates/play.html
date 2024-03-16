@@ -8,12 +8,26 @@
 </head>
 <body>
     <div>Score: <span id="score">{{ session['score'] if 'score' in session else 0 }}</span></div>
+    <button id="rerollButton">Reroll</button>
+    <div>
+        <p>Letters:</p>
+        <p id="letters">{{ letters|join(' ') }}</p>
+    </div>
+
+    <form>
+        <input type="text" id="wordInput" placeholder="Enter a word">
+        <input type="submit" value="Check Word">
+    </form>
+
     <!-- Generated with LLM -->
     <script>
+        console.log("Document loaded.");
+
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelector('form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 var word = document.getElementById('wordInput').value;
+                console.log("Word input.");
                 fetch('/check_word', {
                     method: 'POST',
                     headers: {
@@ -24,8 +38,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.isValid) {
-                        alert('Correct word!');
+                        console.log("Correct!");
                     } else {
+                        console.log("Nope!");
                         alert(data.reason);
                     }
                     document.getElementById('score').textContent = data.score;
@@ -33,20 +48,23 @@
                 });
             });
         });
-    </script>        
+
+
+        document.getElementById('rerollButton').addEventListener('click', function(e) {
+            console.log("Reroll button clicked.");
+            e.preventDefault();
+            fetch('/reroll')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Reroll data:", data);
+                document.getElementById('score').textContent = data.score;
+                document.getElementById('letters').textContent = data.letters.join(' ');
+            }).catch(error => {
+                console.error('Error during reroll:', error);
+            });
+        });
+    </script>
     <!-- End Gen -->
-
-    <button id="rerollButton">Reroll</button>
-    <div>
-        <p>Letters:</p>
-        <p id="letters">{{ letters|join(' ') }}</p>
-    </div>
-    <button id="rerollButton">Reroll</button>
-
-    <form>
-        <input type="text" id="wordInput" placeholder="Enter a word">
-        <input type="submit" value="Check Word">
-    </form>
     
     <a href="{{ url_for('index') }}"><button type="button">Return</button></a>
 </body>
