@@ -80,6 +80,8 @@ def play():
     session['rerolls'] = 0
 
     letters = generate_random_letters()
+    session['letters'] = letters
+    
     return render_template('play.html', letters=letters)
 
 
