@@ -1,0 +1,76 @@
+<!-- play.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Play Game</title>
+    <h1>Play the Game</h1>
+</head>
+<body>
+    <!-- Generated with LLM -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+                var word = $('#wordInput').val();
+                $.ajax({
+                    url: '/check_word',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'word': word }),
+                    success: function(response) {
+                        if (response.isValid) {
+                            alert('Correct word!');
+                        } else {
+                            alert('Incorrect word. Try again!');
+                        }
+                    }
+                });
+            });
+
+            $('#rerollButton').click(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/reroll',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#letters').text(response.letters.join(' '));
+                    }
+                });
+            });
+        });
+    </script>
+
+    <div>Score: <span id="score">{{ session['score'] if 'score' in session else 0 }}</span></div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("rerollButton").addEventListener("click", function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            fetch('/reroll')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("letters").textContent = data.letters.join(' ');
+                    document.getElementById("score").textContent = data.score; // Update score display
+                });
+        });
+    });
+    </script>
+
+    <!-- End Gen -->
+
+    <button id="rerollButton">Reroll</button>
+    <div>
+        <p>Letters:</p>
+        <p id="letters">{{ letters|join(' ') }}</p>
+    </div>
+    <button id="rerollButton">Reroll</button>
+
+    <form>
+        <input type="text" id="wordInput" placeholder="Enter a word">
+        <input type="submit" value="Check Word">
+    </form>
+    
+    <a href="{{ url_for('index') }}"><button type="button">Return</button></a>
+</body>
+</html>
