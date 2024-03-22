@@ -24,12 +24,24 @@
     <a href="/play"><button>Play</button></a>
 
     <h2>Top Scores</h2>
-    <ul>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Score</th>
+            <th>Name</th>
+        </tr>
         {% for score in top_scores %}
-            <li>{{ score.user.username }}: {{ score.score }}</li>
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ score.score }}</td>
+            <td>{{ score.user.username }}</td>
+        </tr>
         {% else %}
-            <li>No scores yet!</li>
+        <tr>
+            <td colspan="3">No scores yet!</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
+
 </body>
 </html>

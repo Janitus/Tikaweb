@@ -1,6 +1,10 @@
 from flask import Blueprint, request, jsonify, current_app, session
 from utils.generator import generate_random_letters
 from collections import Counter
+from flask_login import current_user
+from datetime import datetime
+from models.score import Score
+from extensions import db
 
 play_bp = Blueprint('play_bp', __name__)
 
@@ -64,6 +68,7 @@ def generate_response_data(is_valid, word, in_words_list, can_form):
 
     if session['words'] <= 0:
         response_data['gameOver'] = True
+        handle_game_over()
 
     return response_data
 
@@ -71,3 +76,12 @@ def can_form_word(word, letters):
     word_count = Counter(word)
     letters_count = Counter(letters)
     return all(word_count[char] <= letters_count[char] for char in word_count)
+
+def save_score(score_value):
+    if current_user.is_authenticated:
+        new_score = Score(score=score_value, user_id=current_user.id, timestamp=datetime.utcnow())
+        db.session.add(new_score)
+        db.session.commit()
+
+def handle_game_over():
+    save_score(session['score'])

@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             document.getElementById('score').textContent = data.score;
             document.getElementById('letters').textContent = data.letters;
+            document.getElementById('wordsLeft').textContent = data.attemptsLeft;
 
             if (data.gameOver) {
                 alert(`Game over! You have received ${data.score} score.`);
