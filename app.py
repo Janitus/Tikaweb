@@ -1,10 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask import Flask, render_template, redirect, url_for, flash, request, session, jsonify
+from flask_wtf.csrf import CSRFProtect
 from extensions import db, login_manager
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import RegistrationForm, LoginForm
 from models.user import User
 from models.score import Score
+from models.message import Message
 from play import play_bp
 from utils.generator import generate_random_letters
 
@@ -18,6 +20,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # End Gen
 
+csrf = CSRFProtect(app)
+
 db.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -27,7 +31,8 @@ app.register_blueprint(play_bp)
 @app.route("/")
 def index():
     top_scores = Score.query.order_by(Score.score.desc()).limit(10).all()
-    return render_template('index.html', top_scores=top_scores)
+    messages = Message.query.order_by(Message.created_at.desc()).limit(30).all()
+    return render_template('index.html', top_scores=top_scores, messages=messages)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -84,6 +89,23 @@ def play():
     session['letters'] = letters
     
     return render_template('play.html', letters=letters)
+
+
+@app.route("/post_message", methods=['POST'])
+@login_required
+def post_message():
+    data = request.get_json()
+    content = data.get('content')
+
+    if len(content) > 100:
+        return jsonify({"success": False, "error": "Message content exceeds the maximum allowed length."})
+
+    if content:
+        message = Message(content=content, user_id=current_user.id)
+        db.session.add(message)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Message posted successfully."})
+    return jsonify({"success": False, "error": "Message content is required."})
 
 
 import re

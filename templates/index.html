@@ -43,5 +43,22 @@
         {% endfor %}
     </table>
 
+    <h2>Message Board</h2>
+    {% for message in messages %}
+    <div class="message">
+        <p>{{ message.user.username }}: {{ message.content }} - {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    </div>
+    {% endfor %}
+
+    {% if current_user.is_authenticated %}
+    <form id="messageForm">
+        <textarea id="messageContent" placeholder="Your message here..." required></textarea>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit">Post Message</button>
+    </form>
+    {% else %}
+    <p>Login to post messages.</p>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/messageBoard.js') }}"></script>
 </body>
 </html>
