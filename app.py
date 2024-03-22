@@ -78,6 +78,7 @@ def load_user(user_id):
 def play():
     session['score'] = 0
     session['rerolls'] = 0
+    session['words'] = 3
 
     letters = generate_random_letters()
     session['letters'] = letters

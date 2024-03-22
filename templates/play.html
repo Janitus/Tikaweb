@@ -6,7 +6,7 @@
     <title>Play Game</title>
     <h1>Play the Game</h1>
     <div>Tutorial: <br>
-        You must construct words with length 3 or more using the letters given to you. The letters are amount sensitive. <br>
+        You must construct words with length 3 or more using the letters given to you. You can only use the letters up to the amount of them granted to you! <br>
         You can also reroll if you can't come up with a word, note that rerolls get more expensive the more you use them. <br>
         Good luck! <br>
         <br>
@@ -28,51 +28,14 @@
         <input type="submit" value="Check Word">
     </form>
 
-    <!-- Generated with LLM -->
+    <!-- Generated with LLM (for the js scripts)-->
+
     <script>
-        console.log("Document loaded.");
-
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelector('form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                var word = document.getElementById('wordInput').value;
-                fetch('/check_word', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 'word': word })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.isValid) {
-                        console.log("Correct!");
-                        document.getElementById('wordInput').value = '';
-                    } else {
-                        console.log("Nope!");
-                        alert(data.reason);
-                    }
-                    document.getElementById('score').textContent = data.score;
-                    document.getElementById('letters').textContent = data.letters;
-                });
-            });
-        });
-
-
-        document.getElementById('rerollButton').addEventListener('click', function(e) {
-            console.log("Reroll button clicked.");
-            e.preventDefault();
-            fetch('/reroll')
-            .then(response => response.json())
-            .then(data => {
-                console.log("Reroll data:", data);
-                document.getElementById('score').textContent = data.score;
-                document.getElementById('letters').textContent = data.letters.join(' ');
-            }).catch(error => {
-                console.error('Error during reroll:', error);
-            });
-        });
+        var homeUrl = "{{ url_for('index') }}";
     </script>
+    <script src="{{ url_for('static', filename='js/submission.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reroll.js') }}"></script>    
+
     <!-- End Gen -->
     
     <a href="{{ url_for('index') }}"><button type="button">Return</button></a>

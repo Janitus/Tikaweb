@@ -16,6 +16,9 @@ def reroll():
 
 @play_bp.route('/check_word', methods=['POST'])
 def check_word():
+    if session.get('words', 0) <= 0:
+        return jsonify({'gameOver': True, 'message': 'Game over, no more attempts left.'}), 200
+
     data = request.json
     word = data.get('word', '').lower()
 
@@ -25,16 +28,25 @@ def check_word():
     in_words_list = word in words_list
     can_form = can_form_word(word, letters_list)
 
+    is_valid = update_game_state(word, in_words_list, can_form)
+
+    response_data = generate_response_data(is_valid, word, in_words_list, can_form)
+
+    return jsonify(response_data)
+
+def update_game_state(word, in_words_list, can_form):
     if in_words_list and can_form:
+        session['score'] += (len(word) - 2) ** 2
         is_valid = True
-        session['score'] = session.get('score', 0) + (len(word) - 2) ** 2
-        new_letters = generate_random_letters()
-        session['letters'] = new_letters
     else:
         is_valid = False
-        new_letters = generate_random_letters()
-        session['letters'] = new_letters
 
+    session['words'] -= 1
+    session['letters'] = generate_random_letters()
+
+    return is_valid
+
+def generate_response_data(is_valid, word, in_words_list, can_form):
     if not can_form:
         reason = "Can't form word with given letters."
     elif not in_words_list:
@@ -43,15 +55,17 @@ def check_word():
     response_data = {
         'isValid': is_valid,
         'score': session.get('score', 0),
-        'letters': ' '.join(new_letters)
+        'letters': ' '.join(session['letters']),
+        'attemptsLeft': session.get('words', 0)
     }
 
     if not is_valid:
         response_data['reason'] = reason
 
-    return jsonify(response_data)
+    if session['words'] <= 0:
+        response_data['gameOver'] = True
 
-
+    return response_data
 
 def can_form_word(word, letters):
     word_count = Counter(word)
