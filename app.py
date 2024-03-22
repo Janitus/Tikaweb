@@ -7,6 +7,7 @@ from forms import RegistrationForm, LoginForm
 from models.user import User
 from models.score import Score
 from models.message import Message
+from models.gameround import GameRound
 from play import play_bp
 from utils.generator import generate_random_letters
 import re
@@ -86,10 +87,17 @@ def load_user(user_id):
 
 
 @app.route("/play", methods=['GET', 'POST'])
+@login_required
 def play():
     session['score'] = 0
     session['rerolls'] = 0
     session['words'] = 3
+
+    new_round = GameRound(player_id=current_user.id)
+    db.session.add(new_round)
+    db.session.commit()
+
+    session['game_round_id'] = new_round.id
 
     letters = generate_random_letters()
     session['letters'] = letters
@@ -113,6 +121,12 @@ def post_message():
         return jsonify({"success": True, "message": "Message posted successfully."})
     return jsonify({"success": False, "error": "Message content is required."})
 
+
+@app.route('/game_round/<int:game_round_id>')
+def game_round_details(game_round_id):
+    game_round = GameRound.query.get_or_404(game_round_id)
+    guesses = game_round.guesses
+    return render_template('game_round_details.html', game_round=game_round, guesses=guesses)
 
 
 
@@ -140,16 +154,6 @@ def preprocess_wordlist(file_path):
 
     print(f"Amount of valid words {len(valid_words)} in the game.")
     return valid_words
-
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    log_message = f'Request method: {request.method}, Requested path: {path}, Body: {request.get_data(as_text=True)}'
-    print(log_message)
-    return log_message, 404
-
-
 
 
 if __name__ == "__main__":

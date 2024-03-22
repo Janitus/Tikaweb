@@ -4,6 +4,7 @@ from collections import Counter
 from flask_login import current_user
 from datetime import datetime
 from models.score import Score
+from models.guess import Guess
 from extensions import db
 
 play_bp = Blueprint('play_bp', __name__)
@@ -16,13 +17,17 @@ def reroll():
 
     letters = generate_random_letters()
     session['letters'] = letters
+
+    game_round_id = session.get('game_round_id')
+    if game_round_id:
+        reroll_guess = Guess(game_round_id=game_round_id, letters="".join(letters), guessed_word="REROLLED")
+        db.session.add(reroll_guess)
+        db.session.commit()
+
     return jsonify({'letters': letters, 'score': session['score']})
 
 @play_bp.route('/check_word', methods=['POST'])
 def check_word():
-    print("Headers:", request.headers)
-    print("Body:", request.data)
-
     if session.get('words', 0) <= 0:
         return jsonify({'gameOver': True, 'message': 'Game over, no more attempts left.'}), 200
 
@@ -37,6 +42,13 @@ def check_word():
 
     is_valid = update_game_state(word, in_words_list, can_form)
 
+    game_round_id = session.get('game_round_id')
+    if game_round_id:
+        guessed_word = "NOGUESS" if word == "" else word
+        guess = Guess(game_round_id=game_round_id, letters="".join(letters_list), guessed_word=guessed_word)
+        db.session.add(guess)
+        db.session.commit()
+    
     response_data = generate_response_data(is_valid, word, in_words_list, can_form)
 
     return jsonify(response_data)
@@ -80,11 +92,18 @@ def can_form_word(word, letters):
     letters_count = Counter(letters)
     return all(word_count[char] <= letters_count[char] for char in word_count)
 
-def save_score(score_value):
+def save_score(score_value, game_round_id=None):
     if current_user.is_authenticated:
-        new_score = Score(score=score_value, user_id=current_user.id, timestamp=datetime.utcnow())
+        new_score = Score(score=score_value, user_id=current_user.id, game_round_id=game_round_id, timestamp=datetime.utcnow())
         db.session.add(new_score)
         db.session.commit()
 
 def handle_game_over():
-    save_score(session['score'])
+    game_round_id = session.get('game_round_id')
+    score_value = session.get('score', 0)
+    save_score(score_value, game_round_id)
+    
+    session.pop('score', None)
+    session.pop('game_round_id', None)
+    session.pop('letters', None)
+    session.pop('words', None)

@@ -29,16 +29,24 @@
             <th>Rank</th>
             <th>Score</th>
             <th>Name</th>
+            <th>Game Details</th>
         </tr>
         {% for score in top_scores %}
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ score.score }}</td>
             <td>{{ score.user.username }}</td>
+            <td>
+                {% if score.game_round %}
+                <a href="{{ url_for('game_round_details', game_round_id=score.game_round.id) }}">View Game</a>
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
         </tr>
         {% else %}
         <tr>
-            <td colspan="3">No scores yet!</td>
+            <td colspan="4">No scores yet!</td>
         </tr>
         {% endfor %}
     </table>
