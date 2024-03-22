@@ -11,7 +11,8 @@ from models.gameround import GameRound
 from play import play_bp
 from utils.generator import generate_random_letters
 import re
-
+from sqlalchemy.sql import text
+from datetime import datetime
 
 print("--------- Launching app ---------")
 
@@ -37,8 +38,32 @@ app.register_blueprint(play_bp)
 
 @app.route("/")
 def index():
-    top_scores = Score.query.order_by(Score.score.desc()).limit(10).all()
-    messages = Message.query.order_by(Message.created_at.desc()).limit(30).all()
+    with db.engine.connect() as connection:
+
+        top_scores_sql = text("""
+            SELECT score.id, score.score, user.username AS user_username, score.game_round_id
+            FROM score
+            JOIN user ON user.id = score.user_id
+            ORDER BY score.score DESC
+            LIMIT 10
+        """)
+        top_scores_result = connection.execute(top_scores_sql).fetchall()
+        top_scores = [
+            {"id": row[0], "score": row[1], "username": row[2], "game_round_id": row[3]}
+            for row in top_scores_result
+        ]
+
+        messages_sql = text("""
+            SELECT message.content, message.created_at, user.username AS user_username
+            FROM message
+            JOIN user ON user.id = message.user_id
+            ORDER BY message.created_at DESC
+            LIMIT 30
+        """)
+        messages_result = connection.execute(messages_sql).fetchall()
+        messages = [{"content": row[0], "created_at": row[1], "username": row[2]} for row in messages_result]
+    
+
     return render_template('index.html', top_scores=top_scores, messages=messages)
 
 
@@ -47,11 +72,15 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-        new_user = User(username=form.username.data, password_hash=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Your account has been created!.', 'success')
+
+        sql = text("INSERT INTO user (username, password_hash) VALUES (:username, :password_hash)")
+        
+        with db.engine.begin() as connection:
+            connection.execute(sql, {"username": form.username.data, "password_hash": hashed_password})
+        
+        flash('Your account has been created!', 'success')
         return redirect(url_for('login'))
+    
     return render_template('register.html', title='Register', form=form)
 
 
@@ -59,19 +88,27 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+    
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password_hash, form.password.data):
-            login_user(user)
+        sql = text("SELECT id, username, password_hash FROM user WHERE username = :username")
+        
+        user_dict = None
+        with db.engine.connect() as connection:
+            result = connection.execute(sql, {"username": form.username.data}).fetchone()
+            if result:
+                user_dict = {"id": result[0], "username": result[1], "password_hash": result[2]}
+
+        if user_dict and check_password_hash(user_dict['password_hash'], form.password.data):
+            user_obj = User(id=user_dict['id'], username=user_dict['username'])
+            login_user(user_obj, remember=True)
+            
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
             flash('Login Unsuccessful, please check your credentials!', 'danger')
-            return redirect(url_for('index'))
+    
     return render_template('login.html', title='Login', form=form)
-
-
 
 
 @app.route('/logout')
@@ -83,7 +120,15 @@ def logout():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    sql = text("SELECT * FROM user WHERE id = :user_id")
+    result = db.session.execute(sql, {'user_id': user_id}).fetchone()
+    if result:
+        user = User()
+        user.id = result[0]
+        user.username = result[1]
+        user.password_hash = result[2]
+        return user
+    return None
 
 
 @app.route("/play", methods=['GET', 'POST'])
@@ -91,7 +136,7 @@ def load_user(user_id):
 def play():
     session['score'] = 0
     session['rerolls'] = 0
-    session['words'] = 15
+    session['words'] = 1
 
     new_round = GameRound(player_id=current_user.id)
     db.session.add(new_round)
@@ -115,10 +160,15 @@ def post_message():
         return jsonify({"success": False, "error": "Message content exceeds the maximum allowed length."})
 
     if content:
-        message = Message(content=content, user_id=current_user.id)
-        db.session.add(message)
-        db.session.commit()
-        return jsonify({"success": True, "message": "Message posted successfully."})
+        sql = text("INSERT INTO message (content, user_id, created_at) VALUES (:content, :user_id, :created_at)")
+        current_time = datetime.utcnow()
+        try:
+            with db.engine.begin() as connection:
+                connection.execute(sql, {"content": content, "user_id": current_user.get_id(), "created_at": current_time})
+            return jsonify({"success": True, "message": "Message posted successfully."})
+        except Exception as e:
+            return jsonify({"success": False, "error": "An error occurred while posting the message."})
+    
     return jsonify({"success": False, "error": "Message content is required."})
 
 

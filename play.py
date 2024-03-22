@@ -6,6 +6,7 @@ from datetime import datetime
 from models.score import Score
 from models.guess import Guess
 from extensions import db
+from sqlalchemy.sql import text
 
 play_bp = Blueprint('play_bp', __name__)
 
@@ -92,10 +93,20 @@ def can_form_word(word, letters):
     letters_count = Counter(letters)
     return all(word_count[char] <= letters_count[char] for char in word_count)
 
+
 def save_score(score_value, game_round_id=None):
     if current_user.is_authenticated:
-        new_score = Score(score=score_value, user_id=current_user.id, game_round_id=game_round_id, timestamp=datetime.utcnow())
-        db.session.add(new_score)
+        sql_command = text("""
+            INSERT INTO score (score, user_id, game_round_id, timestamp) 
+            VALUES (:score, :user_id, :game_round_id, :timestamp)
+        """)
+
+        db.session.execute(sql_command, {
+            'score': score_value, 
+            'user_id': current_user.id, 
+            'game_round_id': game_round_id, 
+            'timestamp': datetime.utcnow()
+        })
         db.session.commit()
 
 def handle_game_over():

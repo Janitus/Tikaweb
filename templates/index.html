@@ -34,11 +34,13 @@
         {% for score in top_scores %}
         <tr>
             <td>{{ loop.index }}</td>
-            <td>{{ score.score }}</td>
-            <td>{{ score.user.username }}</td>
+            <td>{{ score['score'] }}</td>
+            <!-- Change here for username access -->
+            <td>{{ score['username'] }}</td>
             <td>
-                {% if score.game_round %}
-                <a href="{{ url_for('game_round_details', game_round_id=score.game_round.id) }}">View Game</a>
+                <!-- Assuming 'game_round_id' is the key for the game round's ID if present -->
+                {% if score['game_round_id'] %}
+                <a href="{{ url_for('game_round_details', game_round_id=score['game_round_id']) }}">View Game</a>
                 {% else %}
                 N/A
                 {% endif %}
@@ -50,11 +52,12 @@
         </tr>
         {% endfor %}
     </table>
+    
 
     <h2>Message Board</h2>
     {% for message in messages %}
     <div class="message">
-        <p>{{ message.user.username }}: {{ message.content }} - {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>{{ message['username'] }}: {{ message['content'] }} - {{ message['created_at'] }}</p>
     </div>
     {% endfor %}
 
