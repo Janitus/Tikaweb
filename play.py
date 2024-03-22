@@ -20,6 +20,9 @@ def reroll():
 
 @play_bp.route('/check_word', methods=['POST'])
 def check_word():
+    print("Headers:", request.headers)
+    print("Body:", request.data)
+
     if session.get('words', 0) <= 0:
         return jsonify({'gameOver': True, 'message': 'Game over, no more attempts left.'}), 200
 

@@ -9,6 +9,8 @@ from models.score import Score
 from models.message import Message
 from play import play_bp
 from utils.generator import generate_random_letters
+import re
+
 
 print("--------- Launching app ---------")
 
@@ -27,6 +29,10 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 app.register_blueprint(play_bp)
+
+
+
+# Routes
 
 @app.route("/")
 def index():
@@ -108,7 +114,7 @@ def post_message():
     return jsonify({"success": False, "error": "Message content is required."})
 
 
-import re
+
 
 def preprocess_wordlist(file_path):
     print("Checking if the word file needs cleaning.")
@@ -134,6 +140,16 @@ def preprocess_wordlist(file_path):
 
     print(f"Amount of valid words {len(valid_words)} in the game.")
     return valid_words
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    log_message = f'Request method: {request.method}, Requested path: {path}, Body: {request.get_data(as_text=True)}'
+    print(log_message)
+    return log_message, 404
+
+
 
 
 if __name__ == "__main__":

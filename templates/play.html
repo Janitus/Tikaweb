@@ -25,6 +25,7 @@
     <form>
         <input type="text" id="wordInput" placeholder="Enter a word">
         <input type="submit" value="Check Word">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     </form>
 
     <!-- Generated with LLM (for the js scripts)-->
