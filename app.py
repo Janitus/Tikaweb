@@ -91,7 +91,7 @@ def load_user(user_id):
 def play():
     session['score'] = 0
     session['rerolls'] = 0
-    session['words'] = 3
+    session['words'] = 15
 
     new_round = GameRound(player_id=current_user.id)
     db.session.add(new_round)

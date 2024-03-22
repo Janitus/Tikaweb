@@ -11,7 +11,7 @@
         <ul>
             {% for guess in guesses %}
                 <li>
-                    Letters: {{ guess.letters }} - Guess/Reroll: {{ guess.guessed_word or "REROLLED" }}
+                    Letters: {{ guess.letters }} - Word: {{ guess.guessed_word or "REROLLED" }}
                 </li>
             {% else %}
                 <p>No guesses found for this game round.</p>
