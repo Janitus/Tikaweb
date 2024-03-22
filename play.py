@@ -32,7 +32,8 @@ def check_word():
         session['letters'] = new_letters
     else:
         is_valid = False
-        new_letters = letters_list
+        new_letters = generate_random_letters()
+        session['letters'] = new_letters
 
     if not can_form:
         reason = "Can't form word with given letters."

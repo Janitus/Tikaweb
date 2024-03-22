@@ -36,7 +36,6 @@
             document.querySelector('form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 var word = document.getElementById('wordInput').value;
-                console.log("Word input.");
                 fetch('/check_word', {
                     method: 'POST',
                     headers: {
@@ -48,6 +47,7 @@
                 .then(data => {
                     if (data.isValid) {
                         console.log("Correct!");
+                        document.getElementById('wordInput').value = '';
                     } else {
                         console.log("Nope!");
                         alert(data.reason);

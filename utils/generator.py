@@ -11,9 +11,18 @@ def generate_random_letters():
     best_consonants = ['t','n','s','r','h'] # top 5 consonants english
 
     bests = random.choices(best_vowels, k=2)
-    all_vowels = random.choices(all_vowels, k=1)
+    all_vowels_choice = random.choices(all_vowels, k=1)
     third = random.choices(best_consonants, k=3)
-    remaining_letters = random.choices(string.ascii_lowercase, k=5)
-    letters = bests + all_vowels + third + remaining_letters
+
+    chosen_letters = set(bests + all_vowels_choice + third)
+    
+    remaining_letters = []
+    while len(remaining_letters) < 5:
+        remaining_letters_pool = [letter for letter in string.ascii_lowercase if letter not in chosen_letters]
+        new_letter = random.choice(remaining_letters_pool)
+        remaining_letters.append(new_letter)
+        chosen_letters.add(new_letter)
+
+    letters = bests + all_vowels_choice + third + remaining_letters
     random.shuffle(letters)
     return letters
