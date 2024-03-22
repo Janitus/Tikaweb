@@ -26,3 +26,14 @@ Correct word will score (Length of the word - 2) ^ 2. A correct word must be:
 Successful word check will automatically reroll.
 
 Skip reroll penalty: Each reroll costs 3 * the amount of rerolls taken in the game, note that this only applies if you press the reroll button itself, the success rerolls do not deduct from points!
+
+# Course Requirements & What this project offers
+
+- The website has been made with flask
+- Contains 5 tables
+    - Score, used to store score of games and to display them on the highscores
+    - User, self-explanatory
+    - GameRound, used to store the flow of the game by containing a list of guesses (can find them linked in the highscores)
+    - Guess, contains information on what the player guessed (or rerolled) and the letters they had. Useful to check how well someone might've played in the highscores
+    - Message, contains messages from users displayed in the front page, almost like a chat.
+- Uses SQL queries to handle functionalities between the website and the database
