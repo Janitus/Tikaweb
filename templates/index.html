@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Word Game</title>
 </head>
 <body>
@@ -55,12 +56,6 @@
     
 
     <h2>Message Board</h2>
-    {% for message in messages %}
-    <div class="message">
-        <p>{{ message['username'] }}: {{ message['content'] }} - {{ message['created_at'] }}</p>
-    </div>
-    {% endfor %}
-
     {% if current_user.is_authenticated %}
     <form id="messageForm">
         <textarea id="messageContent" placeholder="Your message here..." required></textarea>
@@ -70,6 +65,13 @@
     {% else %}
     <p>Login to post messages.</p>
     {% endif %}
+
+    {% for message in messages %}
+    <div class="message">
+        <p>{{ message['username'] }}: {{ message['content'] }} - {{ message['created_at'] }}</p>
+    </div>
+    {% endfor %}
+    
     <script src="{{ url_for('static', filename='js/messageBoard.js') }}"></script>
 </body>
 </html>
