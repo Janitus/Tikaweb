@@ -140,7 +140,7 @@ def load_user(user_id):
 def play():
     session['score'] = 0
     session['rerolls'] = 0
-    session['words'] = 1
+    session['words'] = os.getenv('GUESSES_PER_GAME', '5')
 
     new_round = GameRound(player_id=current_user.id)
     db.session.add(new_round)
