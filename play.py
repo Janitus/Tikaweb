@@ -21,9 +21,20 @@ def reroll():
 
     game_round_id = session.get('game_round_id')
     if game_round_id:
-        reroll_guess = Guess(game_round_id=game_round_id, letters="".join(letters), guessed_word="REROLLED")
-        db.session.add(reroll_guess)
-        db.session.commit()
+        sql = text('''
+            INSERT INTO "guess" ("game_round_id", "letters", "guessed_word", "created_at") 
+            VALUES (:game_round_id, :letters, 'REROLLED', :created_at)
+        ''')
+        current_time = datetime.utcnow()
+        try:
+            with db.engine.begin() as connection:
+                connection.execute(sql, {
+                    "game_round_id": game_round_id,
+                    "letters": "".join(letters),
+                    "created_at": current_time
+                })
+        except Exception as e:
+            print(e)
 
     return jsonify({'letters': letters, 'score': session['score']})
 

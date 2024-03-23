@@ -5,12 +5,10 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import RegistrationForm, LoginForm
 from models.user import User
-from models.score import Score
-from models.message import Message
 from models.gameround import GameRound
 from play import play_bp
 from utils.generator import generate_random_letters
-import re
+from wordlist_processor import preprocess_wordlist
 from sqlalchemy.sql import text
 from datetime import datetime
 from dotenv import load_dotenv
@@ -185,32 +183,6 @@ def game_round_details(game_round_id):
     guesses = game_round.guesses
     return render_template('game_round_details.html', game_round=game_round, guesses=guesses)
 
-
-
-def preprocess_wordlist(file_path):
-    print("Checking if the word file needs cleaning.")
-    discarded_count = 0
-    valid_words = []
-
-    with open(file_path, 'r') as file:
-        for line in file:
-            word = line.strip().lower()
-            if len(word) > 2 and re.match('^[a-z]+$', word):
-                valid_words.append(word)
-            else:
-                discarded_count += 1
-
-    with open(file_path, 'w') as file:
-        for word in valid_words:
-            file.write(word + '\n')
-
-    if discarded_count > 0:
-        print(f"Discarded {discarded_count} words from the file.")
-    else:
-        print("No words discarded from the text file.")
-
-    print(f"Amount of valid words {len(valid_words)} in the game.")
-    return valid_words
 
 
 if __name__ == "__main__":
