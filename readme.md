@@ -1,3 +1,5 @@
+**Kurssin ohjaajille viesti: Teen kurssin omalla aikataulullani ilman ohjausta. Projektin pitäisi olla nyt täysin valmis (Jos ei jotain ongelmia ole mistä en tiedä).**
+
 # Project
 
 The project is a simple word game in which the player is given a random set of letters to construct a word with. When the player constructs a word that is found in the database, they will receive score equal to the length of the word ^ 2, and new letters will be arranged. There will be 11 letters given, and the player can press reroll button to gain new letters with progressively increasing penalty.
