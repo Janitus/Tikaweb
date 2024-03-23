@@ -13,14 +13,17 @@ from utils.generator import generate_random_letters
 import re
 from sqlalchemy.sql import text
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 print("--------- Launching app ---------")
 
 app = Flask(__name__)
 
 # Generated with LLM
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # End Gen
 
@@ -41,9 +44,9 @@ def index():
     with db.engine.connect() as connection:
 
         top_scores_sql = text("""
-            SELECT score.id, score.score, user.username AS user_username, score.game_round_id
+            SELECT score.id, score.score, "user".username AS user_username, score.game_round_id
             FROM score
-            JOIN user ON user.id = score.user_id
+            JOIN "user" ON "user".id = score.user_id
             ORDER BY score.score DESC
             LIMIT 10
         """)
@@ -54,9 +57,9 @@ def index():
         ]
 
         messages_sql = text("""
-            SELECT message.content, message.created_at, user.username AS user_username
+            SELECT message.content, message.created_at, "user".username AS user_username
             FROM message
-            JOIN user ON user.id = message.user_id
+            JOIN "user" ON "user".id = message.user_id
             ORDER BY message.created_at DESC
             LIMIT 30
         """)
@@ -73,7 +76,8 @@ def register():
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
 
-        sql = text("INSERT INTO user (username, password_hash) VALUES (:username, :password_hash)")
+        sql = text('INSERT INTO "user" (username, password_hash) VALUES (:username, :password_hash)')
+
         
         with db.engine.begin() as connection:
             connection.execute(sql, {"username": form.username.data, "password_hash": hashed_password})
@@ -91,7 +95,8 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        sql = text("SELECT id, username, password_hash FROM user WHERE username = :username")
+        sql = text('SELECT id, username, password_hash FROM "user" WHERE username = :username')
+
         
         user_dict = None
         with db.engine.connect() as connection:
@@ -120,7 +125,8 @@ def logout():
 
 @login_manager.user_loader
 def load_user(user_id):
-    sql = text("SELECT * FROM user WHERE id = :user_id")
+    #sql = text("SELECT * FROM user WHERE id = :user_id")
+    sql = text('SELECT "id", "username", "password_hash" FROM "user" WHERE "id" = :user_id')
     result = db.session.execute(sql, {'user_id': user_id}).fetchone()
     if result:
         user = User()
@@ -160,15 +166,16 @@ def post_message():
         return jsonify({"success": False, "error": "Message content exceeds the maximum allowed length."})
 
     if content:
-        sql = text("INSERT INTO message (content, user_id, created_at) VALUES (:content, :user_id, :created_at)")
+        sql = text('INSERT INTO "message" ("content", "user_id", "created_at") VALUES (:content, :user_id, :created_at)')
         current_time = datetime.utcnow()
         try:
             with db.engine.begin() as connection:
                 connection.execute(sql, {"content": content, "user_id": current_user.get_id(), "created_at": current_time})
             return jsonify({"success": True, "message": "Message posted successfully."})
         except Exception as e:
+            print(e)
             return jsonify({"success": False, "error": "An error occurred while posting the message."})
-    
+
     return jsonify({"success": False, "error": "Message content is required."})
 
 

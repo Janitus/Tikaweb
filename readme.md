@@ -6,6 +6,13 @@ The player gets a number of attempts to come up with as many words as is possibl
 
 The player can also leave messages on the message board when they are logged in should they wish to communicate with other players.
 
+# Configuration
+
+1. Create your database for psql using the name you like. I used "tikawebdb"
+2. Create .env file in the project root folder (where app.py is)
+3. Insert "SECRET_KEY=[your-key]"
+4. Insert "DATABASE_URL=postgresql://[your-username]:[your-password]@localhost/[name-of-the-database]"
+
 # Word system
 
 Only words found in the data/wordlist.txt will be compared against. Words that are invalid are either modified or removed.

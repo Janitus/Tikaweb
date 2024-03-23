@@ -1,2 +1,3 @@
 venv/
 reset_db.py
+.env
