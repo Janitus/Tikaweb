@@ -29,7 +29,7 @@ IN PROGRESS
 ## Startup
 
 1. venv\Scripts\activate
-2. 
+2. python app.py
 
 ## Optional
 
