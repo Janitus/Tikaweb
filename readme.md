@@ -6,7 +6,7 @@ The player gets a number of attempts to come up with as many words as is possibl
 
 The player can also leave messages on the message board when they are logged in should they wish to communicate with other players.
 
-# Configuration
+# How to use the project
 
 ## Install
 
@@ -23,7 +23,19 @@ Install using pip install -r requirements.txt
 
 Set the number of words given to the player per game in .env "GUESSES_PER_GAME=[amount]" (Default is 5)
 
-# Word system
+## Startup
+
+Go to the project root using commandline and enter python app.py, and open the url it gives in a browser
+
+## How to register & login
+
+![RegisterLogin](https://github.com/Janitus/Tikaweb/blob/main/media/login.gif)
+
+## How to play & inspect the game
+
+![PlayInspect](https://github.com/Janitus/Tikaweb/blob/main/media/play.gif)
+
+# Word system & How to add your own words
 
 Only words found in the data/wordlist.txt will be compared against. Words that are invalid are either modified or removed.
 
