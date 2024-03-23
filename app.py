@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import RegistrationForm, LoginForm
 from models.user import User
 from models.gameround import GameRound
+from models.message import Message # Required by db.createall do not remove!
 from play import play_bp
 from utils.generator import generate_random_letters
 from wordlist_processor import preprocess_wordlist
