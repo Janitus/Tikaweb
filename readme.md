@@ -8,18 +8,30 @@ The player can also leave messages on the message board when they are logged in 
 
 # How to use the project
 
+IN PROGRESS
+
 ## Install
 
-Install using pip install -r requirements.txt
+1. Git clone this repository
+2. Go to project root in cmd
+3. python -m venv venv
+4. venv\Scripts\activate
+5. pip install -r requirements.txt
 
 ## Database
 
-1. Create your database for psql using the name you like. I used "tikawebdb"
-2. Create .env file in the project root folder (where app.py is)
-3. Insert "SECRET_KEY=[your-key]"
-4. Insert "DATABASE_URL=postgresql://[your-username]:[your-password]@localhost/[name-of-the-database]"
+1. Install and ensure you have psql running
+2. run cmd createdb -U [your-username] [your-db-name] (I use tikaweb for db-name)
+3. Create .env file in the project root folder (where app.py is)
+4. Insert "SECRET_KEY=[your-key]"
+5. Insert "DATABASE_URL=postgresql://[your-username]:[your-password]@localhost/[name-of-the-database]"
 
-## Project (Optional)
+## Startup
+
+1. venv\Scripts\activate
+2. 
+
+## Optional
 
 Set the number of words given to the player per game in .env "GUESSES_PER_GAME=[amount]" (Default is 5)
 
