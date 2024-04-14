@@ -2,7 +2,7 @@
 
 # Project
 
-The project is a simple word game in which the player is given a random set of letters to construct a word with. When the player constructs a word that is found in the database, they will receive score equal to the length of the word ^ 2, and new letters will be arranged. There will be 11 letters given, and the player can press reroll button to gain new letters with progressively increasing penalty.
+The project is a simple word game in which the player is given a random set of letters to construct a word with. When the player constructs a word that is found in the database, they will receive score equal to the (length of the word - 2) ^ 2, and new letters will be arranged. There will be 11 letters given, and the player can press reroll button to gain new letters with progressively increasing penalty.
 
 The player gets a number of attempts to come up with as many words as is possible (rerolls do not subtract), after which the game ends and the player has their game recorded into the highscores which will be displayed to everybody. It is also possible to inspect the record of the game, along with both the letters, rerolls and the guessed word.
 
