@@ -1,3 +1,5 @@
+**Kurssin ohjaajille viesti: Teen kurssin omalla aikataulullani ilman ohjausta. Projektin pitäisi olla nyt täysin valmis (Jos ei jotain ongelmia ole mistä en tiedä).**
+
 # Project
 
 The project is a simple word game in which the player is given a random set of letters to construct a word with. When the player constructs a word that is found in the database, they will receive score equal to the length of the word ^ 2, and new letters will be arranged. There will be 11 letters given, and the player can press reroll button to gain new letters with progressively increasing penalty.
@@ -7,8 +9,6 @@ The player gets a number of attempts to come up with as many words as is possibl
 The player can also leave messages on the message board when they are logged in should they wish to communicate with other players.
 
 # How to use the project
-
-IN PROGRESS
 
 ## Install
 
@@ -20,24 +20,23 @@ IN PROGRESS
 
 ## Database
 
-1. Install and ensure you have psql running
+1. Install and ensure you have psql running (If you already have, skip this step!)
 2. run cmd createdb -U [your-username] [your-db-name] (I use tikaweb for db-name)
 3. Create .env file in the project root folder (where app.py is)
-4. Insert "SECRET_KEY=[your-key]"
-5. Insert "DATABASE_URL=postgresql://[your-username]:[your-password]@localhost/[name-of-the-database]"
+4. Include the following variables in the .env file
+5. SECRET_KEY=[your-key]
+6. DATABASE_URL=postgresql://[your-username]:[your-password]@localhost/[name-of-the-database]
 
 ## Startup
 
 1. venv\Scripts\activate
 2. python app.py
 
-## Optional
+Your program should now be running!
 
-Set the number of words given to the player per game in .env "GUESSES_PER_GAME=[amount]" (Default is 5)
+## Optional environment variables
 
-## Startup
-
-Go to the project root using commandline and enter python app.py, and open the url it gives in a browser
+- GUESSES_PER_GAME=[amount] # Sets the amount of word guesses the player gets per game round. Default is 5
 
 ## How to register & login
 
